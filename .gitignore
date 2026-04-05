@@ -1,0 +1,19 @@
+# Data files
+*.csv
+*.pkl
+*.zip
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Models
+*.h5
+*.pt
+*.pth
