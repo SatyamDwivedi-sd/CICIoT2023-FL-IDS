@@ -1,0 +1,33 @@
+{
+  "notebook": "07_Baseline_Multiclass_ML",
+  "dataset": "CICIoT2023",
+  "train_rows": 1629654,
+  "val_rows": 2100516,
+  "test_rows": 4201031,
+  "features": 39,
+  "num_classes": 8,
+  "train_balanced": true,
+  "test_imbalanced": true,
+  "balancing_method": "RandomUnderSampler + SMOTE-ENN (from nb06)",
+  "rf": {
+    "params": "{'n_estimators': 100, 'max_depth': None, 'min_samples_leaf': 1, 'max_features': 'sqrt', 'class_weight': None, 'n_jobs': -1, 'random_state': 42, 'verbose': 1}",
+    "train_time_s": 68.7,
+    "test_accuracy": 0.7957,
+    "test_f1_macro": 0.6674,
+    "test_f1_wt": 0.8072
+  },
+  "xgboost": {
+    "params": "{'objective': 'multi:softprob', 'num_class': 8, 'n_estimators': 300, 'max_depth': 6, 'learning_rate': 0.1, 'subsample': 0.8, 'colsample_bytree': 0.8, 'tree_method': 'hist', 'device': 'cuda', 'eval_metric': 'mlogloss', 'random_state': 42, 'verbosity': 1}",
+    "train_time_s": 14.1,
+    "test_accuracy": 0.795,
+    "test_f1_macro": 0.6691,
+    "test_f1_wt": 0.8068
+  },
+  "notes": [
+    "Test set uses original imbalanced distribution \u2014 never touched during training",
+    "Training set balanced with SMOTE-ENN + RandomUnderSampler",
+    "XGBoost trained with A100 GPU (device=cuda, tree_method=hist)",
+    "RF trained on CPU (n_jobs=-1)",
+    "Per-class F1 on imbalanced test is the key metric \u2014 not overall accuracy"
+  ]
+}
