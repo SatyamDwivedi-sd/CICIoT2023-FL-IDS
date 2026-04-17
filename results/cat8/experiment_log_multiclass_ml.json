@@ -1,0 +1,21 @@
+{
+  "script": "06_train_multiclass_ml",
+  "dataset": "CICIoT2023",
+  "task": "cat8_multiclass",
+  "train_balanced": true,
+  "test_imbalanced": true,
+  "models": {
+    "RF": {
+      "accuracy": 0.7966,
+      "f1_macro": 0.6687,
+      "f1_weighted": 0.8079,
+      "train_time_s": 66.0
+    },
+    "XGBoost": {
+      "accuracy": 0.7989,
+      "f1_macro": 0.6746,
+      "f1_weighted": 0.8101,
+      "train_time_s": 11.9
+    }
+  }
+}
