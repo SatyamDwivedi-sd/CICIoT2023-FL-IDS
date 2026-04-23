@@ -63,6 +63,24 @@
 
 ---
 
+## Train vs Test Metrics
+
+Values from experiment logs (ground truth files). Gap = train_f1_macro − test_f1_macro.
+
+| Model | Train Acc | Train F1-M | Train F1-W | Test Acc | Test F1-M | Test F1-W | Gap (F1-M) |
+|-------|:---------:|:----------:|:----------:|:--------:|:---------:|:---------:|:----------:|
+| Random Forest | 1.000 | 1.000 | 1.000 | 0.7966 | 0.6687 | 0.8079 | **0.331** |
+| XGBoost | 0.9825 | 0.9701 | 0.9824 | 0.7989 | 0.6746 | 0.8101 | **0.296** |
+| MLP | 0.9160 | 0.8266 | 0.9138 | 0.7439 | 0.5861 | 0.7604 | **0.241** |
+| 1D CNN | 0.8971 | 0.7940 | 0.8930 | 0.7316 | 0.5701 | 0.7480 | **0.224** |
+
+- **RF is fully overfit on training data** (train F1-macro = 1.000) — decision trees memorise the balanced training set exactly. The 0.331 gap is the largest of all models and confirms RF's high variance on this task.
+- **XGBoost generalises better than RF** (gap = 0.296) due to gradient boosting's regularisation (shrinkage, subsampling), but still shows substantial gap — the balanced→imbalanced distribution shift is the dominant cause, not classical overfitting.
+- **DL models show the healthiest gaps** (MLP 0.241, CNN 0.224) — Dropout and BatchNorm act as strong regularisers, preventing memorisation of the balanced training distribution. The smaller gap suggests DL learns more transferable representations.
+- **Train/test distribution shift is the primary driver of all gaps**: models are trained on SMOTE-ENN balanced data (~200K/class) but tested on the original imbalanced distribution (DDoS = 58.5%, Web = 0.11%). Even a perfectly calibrated model would show a gap purely from this shift.
+
+---
+
 ## Notes
 
 - **Training:** SMOTE-ENN balanced splits; `class_weight=None` (no double-weighting).  
