@@ -10,20 +10,26 @@
   "test_imbalanced": true,
   "models": {
     "MLP": {
-      "accuracy": 0.7387,
-      "balanced_accuracy": 0.6457,
-      "f1_macro": 0.5864,
-      "f1_weighted": 0.7559,
-      "mcc": 0.6353,
-      "train_time_s": 57.4
+      "test_accuracy": 0.7439,
+      "test_balanced_accuracy": 0.6421,
+      "test_f1_macro": 0.5861,
+      "test_f1_weighted": 0.7604,
+      "test_mcc": 0.6385,
+      "train_accuracy": 0.916,
+      "train_f1_macro": 0.8266,
+      "train_f1_weighted": 0.9138,
+      "train_time_s": 34.2
     },
     "1D CNN": {
-      "accuracy": 0.7388,
-      "balanced_accuracy": 0.6389,
-      "f1_macro": 0.5812,
-      "f1_weighted": 0.7552,
-      "mcc": 0.6339,
-      "train_time_s": 924.5
+      "test_accuracy": 0.7316,
+      "test_balanced_accuracy": 0.6167,
+      "test_f1_macro": 0.5701,
+      "test_f1_weighted": 0.748,
+      "test_mcc": 0.6239,
+      "train_accuracy": 0.8971,
+      "train_f1_macro": 0.794,
+      "train_f1_weighted": 0.893,
+      "train_time_s": 395.2
     }
   }
 }

@@ -60,6 +60,7 @@ def parse_args() -> argparse.Namespace:
 
 def _build_results_csv(
     models: dict,          # {model_name: metrics_dict}
+    train_metrics: dict,   # {model_name: metrics_dict} on balanced train set
     y_test: np.ndarray,
     categories: list[str],
 ) -> pd.DataFrame:
@@ -73,15 +74,29 @@ def _build_results_csv(
             row["support"]                   = m["per_class"][cat]["support"]
         rows.append(row)
 
-    for label in ("ACCURACY", "F1_MACRO", "F1_WEIGHTED"):
-        key = label.lower().replace("_", "_")
+    test_key_map = {
+        "TEST_ACCURACY":    "accuracy",
+        "TEST_F1_MACRO":    "f1_macro",
+        "TEST_F1_WEIGHTED": "f1_weighted",
+    }
+    for label, key in test_key_map.items():
         row = {"category": label, "support": len(y_test)}
         for name, m in models.items():
-            val = {
-                "ACCURACY": m["accuracy"],
-                "F1_MACRO": m["f1_macro"],
-                "F1_WEIGHTED": m["f1_weighted"],
-            }[label]
+            val = m[key]
+            row[f"{name.lower()}_precision"] = val
+            row[f"{name.lower()}_recall"]    = val
+            row[f"{name.lower()}_f1"]        = val
+        rows.append(row)
+
+    train_key_map = {
+        "TRAIN_ACCURACY":    "accuracy",
+        "TRAIN_F1_MACRO":    "f1_macro",
+        "TRAIN_F1_WEIGHTED": "f1_weighted",
+    }
+    for label, key in train_key_map.items():
+        row = {"category": label, "support": None}
+        for name, tm in train_metrics.items():
+            val = tm[key]
             row[f"{name.lower()}_precision"] = val
             row[f"{name.lower()}_recall"]    = val
             row[f"{name.lower()}_f1"]        = val
@@ -110,8 +125,9 @@ def main() -> None:
         X_train.shape, X_val.shape, X_test.shape,
     )
 
-    all_metrics: dict[str, dict] = {}
-    all_times:   dict[str, float] = {}
+    all_metrics:       dict[str, dict] = {}
+    all_train_metrics: dict[str, dict] = {}
+    all_times:         dict[str, float] = {}
 
     for ModelClass, model_name, ckpt_name, extra_params in [
         (
@@ -149,8 +165,14 @@ def main() -> None:
         m = mc.compute(y_test.values, test_pred)
         mc.print_report(m, model_name, "Test (Imbalanced)")
 
-        all_metrics[model_name] = m
-        all_times[model_name]   = elapsed
+        # Evaluate on balanced training set
+        train_pred = model.predict(X_train.values)
+        train_m = mc.compute(y_train.values, train_pred)
+        mc.print_report(train_m, model_name, "Train (Balanced)")
+
+        all_metrics[model_name]       = m
+        all_train_metrics[model_name] = train_m
+        all_times[model_name]         = elapsed
 
         plotter.plot_confusion_matrix_multi(
             y_test.values, test_pred,
@@ -174,7 +196,7 @@ def main() -> None:
         save_path=args.results_dir / "ml_baseline_f1_comparison.png",
     )
 
-    results_df = _build_results_csv(all_metrics, y_test.values, categories)
+    results_df = _build_results_csv(all_metrics, all_train_metrics, y_test.values, categories)
     csv_path = args.results_dir / "results_ml_baseline_cat8.csv"
     results_df.to_csv(csv_path, index=False)
 
@@ -186,10 +208,13 @@ def main() -> None:
         "test_imbalanced": True,
         "models": {
             name: {
-                "accuracy":    round(m["accuracy"],    4),
-                "f1_macro":    round(m["f1_macro"],    4),
-                "f1_weighted": round(m["f1_weighted"], 4),
-                "train_time_s": round(t, 1),
+                "test_accuracy":     round(m["accuracy"],                          4),
+                "test_f1_macro":     round(m["f1_macro"],                          4),
+                "test_f1_weighted":  round(m["f1_weighted"],                       4),
+                "train_accuracy":    round(all_train_metrics[name]["accuracy"],    4),
+                "train_f1_macro":    round(all_train_metrics[name]["f1_macro"],    4),
+                "train_f1_weighted": round(all_train_metrics[name]["f1_weighted"], 4),
+                "train_time_s":      round(t, 1),
             }
             for (name, m), t in zip(all_metrics.items(), all_times.values())
         },

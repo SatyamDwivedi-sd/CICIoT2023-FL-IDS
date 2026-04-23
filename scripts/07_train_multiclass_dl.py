@@ -213,7 +213,7 @@ def print_report(metrics: dict, model_name: str) -> None:
 
 
 def _build_results_csv(
-    models: dict, y_test: np.ndarray, categories: list[str]
+    models: dict, train_metrics: dict, y_test: np.ndarray, categories: list[str]
 ) -> pd.DataFrame:
     rows = []
     for cat in categories:
@@ -226,15 +226,33 @@ def _build_results_csv(
             row["support"]             = m["per_class"][cat]["support"]
         rows.append(row)
 
-    for label in ("ACCURACY", "BALANCED_ACCURACY", "F1_MACRO", "F1_WEIGHTED", "MCC"):
+    test_key_map = {
+        "TEST_ACCURACY":          "accuracy",
+        "TEST_BALANCED_ACCURACY": "balanced_accuracy",
+        "TEST_F1_MACRO":          "f1_macro",
+        "TEST_F1_WEIGHTED":       "f1_weighted",
+        "TEST_MCC":               "mcc",
+    }
+    for label, key in test_key_map.items():
         row = {"category": label, "support": len(y_test)}
-        key_map = {
-            "ACCURACY": "accuracy", "BALANCED_ACCURACY": "balanced_accuracy",
-            "F1_MACRO": "f1_macro", "F1_WEIGHTED": "f1_weighted", "MCC": "mcc",
-        }
         for name, m in models.items():
             prefix = name.lower().replace(" ", "_")
-            val = m[key_map[label]]
+            val = m[key]
+            row[f"{prefix}_precision"] = val
+            row[f"{prefix}_recall"]    = val
+            row[f"{prefix}_f1"]        = val
+        rows.append(row)
+
+    train_key_map = {
+        "TRAIN_ACCURACY":    "accuracy",
+        "TRAIN_F1_MACRO":    "f1_macro",
+        "TRAIN_F1_WEIGHTED": "f1_weighted",
+    }
+    for label, key in train_key_map.items():
+        row = {"category": label, "support": None}
+        for name, tm in train_metrics.items():
+            prefix = name.lower().replace(" ", "_")
+            val = tm[key]
             row[f"{prefix}_precision"] = val
             row[f"{prefix}_recall"]    = val
             row[f"{prefix}_f1"]        = val
@@ -284,9 +302,10 @@ def main() -> None:
 
     from tensorflow import keras
 
-    all_metrics:   dict[str, dict] = {}
-    all_histories: dict[str, dict] = {}
-    all_times:     dict[str, float] = {}
+    all_metrics:       dict[str, dict] = {}
+    all_train_metrics: dict[str, dict] = {}
+    all_histories:     dict[str, dict] = {}
+    all_times:         dict[str, float] = {}
 
     import time
 
@@ -328,13 +347,19 @@ def main() -> None:
         )
         elapsed = time.time() - t0
 
-        # ── Evaluate ──────────────────────────────────────────────────────
+        # ── Evaluate on imbalanced test set ───────────────────────────────
         prob  = model.predict(X_test_in, batch_size=args.batch_size, verbose=0)
         pred  = np.argmax(prob, axis=1)
         m     = compute_metrics(y_te, pred, categories)
         print_report(m, model_name)
 
-        all_metrics[model_name]   = m
+        # ── Evaluate on balanced training set ─────────────────────────────
+        train_prob = model.predict(X_train_in, batch_size=args.batch_size, verbose=0)
+        train_pred = np.argmax(train_prob, axis=1)
+        train_m    = compute_metrics(y_tr, train_pred, categories)
+
+        all_metrics[model_name]       = m
+        all_train_metrics[model_name] = train_m
         all_histories[model_name] = {
             "train_loss": history.history["loss"],
             "val_loss":   history.history["val_loss"],
@@ -364,7 +389,7 @@ def main() -> None:
         save_path=args.results_dir / "dl_baseline_f1_comparison.png",
     )
 
-    results_df = _build_results_csv(all_metrics, y_te, categories)
+    results_df = _build_results_csv(all_metrics, all_train_metrics, y_te, categories)
     results_df.to_csv(args.results_dir / "results_dl_baseline_cat8.csv", index=False)
 
     history_bundle = {
@@ -387,12 +412,15 @@ def main() -> None:
         "test_imbalanced": True,
         "models": {
             name: {
-                "accuracy":          round(m["accuracy"],          4),
-                "balanced_accuracy": round(m["balanced_accuracy"], 4),
-                "f1_macro":          round(m["f1_macro"],          4),
-                "f1_weighted":       round(m["f1_weighted"],       4),
-                "mcc":               round(m["mcc"],               4),
-                "train_time_s":      round(all_times[name],        1),
+                "test_accuracy":          round(m["accuracy"],                          4),
+                "test_balanced_accuracy": round(m["balanced_accuracy"],                 4),
+                "test_f1_macro":          round(m["f1_macro"],                          4),
+                "test_f1_weighted":       round(m["f1_weighted"],                       4),
+                "test_mcc":               round(m["mcc"],                               4),
+                "train_accuracy":         round(all_train_metrics[name]["accuracy"],    4),
+                "train_f1_macro":         round(all_train_metrics[name]["f1_macro"],    4),
+                "train_f1_weighted":      round(all_train_metrics[name]["f1_weighted"], 4),
+                "train_time_s":           round(all_times[name],                        1),
             }
             for name, m in all_metrics.items()
         },

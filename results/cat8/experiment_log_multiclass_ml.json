@@ -6,16 +6,22 @@
   "test_imbalanced": true,
   "models": {
     "RF": {
-      "accuracy": 0.7966,
-      "f1_macro": 0.6687,
-      "f1_weighted": 0.8079,
-      "train_time_s": 66.0
+      "test_accuracy": 0.7966,
+      "test_f1_macro": 0.6687,
+      "test_f1_weighted": 0.8079,
+      "train_accuracy": 1.0,
+      "train_f1_macro": 1.0,
+      "train_f1_weighted": 1.0,
+      "train_time_s": 71.3
     },
     "XGBoost": {
-      "accuracy": 0.7989,
-      "f1_macro": 0.6746,
-      "f1_weighted": 0.8101,
-      "train_time_s": 11.9
+      "test_accuracy": 0.7989,
+      "test_f1_macro": 0.6746,
+      "test_f1_weighted": 0.8101,
+      "train_accuracy": 0.9825,
+      "train_f1_macro": 0.9701,
+      "train_f1_weighted": 0.9824,
+      "train_time_s": 11.8
     }
   }
 }
