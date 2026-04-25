@@ -1,0 +1,70 @@
+{
+  "dataset": "CICIoT2023",
+  "task": "cat8_multiclass",
+  "total_train": 14703605,
+  "num_clients": 10,
+  "num_classes": 8,
+  "class_names": [
+    "DDoS",
+    "DoS",
+    "Mirai",
+    "Benign",
+    "Recon",
+    "Spoofing",
+    "Web",
+    "BruteForce"
+  ],
+  "random_seed": 42,
+  "schemes": {
+    "iid": {
+      "client_sizes": [
+        1470361,
+        1470361,
+        1470361,
+        1470361,
+        1470361,
+        1470360,
+        1470360,
+        1470360,
+        1470360,
+        1470360
+      ],
+      "indices_file": "iid_client_indices.npz",
+      "class_counts_file": "iid_client_class_counts.csv"
+    },
+    "dirichlet_03": {
+      "alpha": 0.3,
+      "client_sizes": [
+        1372352,
+        1030609,
+        3506823,
+        1265880,
+        579925,
+        876387,
+        3981282,
+        379746,
+        546687,
+        1163914
+      ],
+      "indices_file": "dirichlet_03_client_indices.npz",
+      "class_counts_file": "dirichlet_03_client_class_counts.csv"
+    },
+    "dirichlet_01": {
+      "alpha": 0.1,
+      "client_sizes": [
+        158033,
+        228365,
+        7674504,
+        77121,
+        511676,
+        247105,
+        1593358,
+        4093974,
+        73110,
+        46359
+      ],
+      "indices_file": "dirichlet_01_client_indices.npz",
+      "class_counts_file": "dirichlet_01_client_class_counts.csv"
+    }
+  }
+}
