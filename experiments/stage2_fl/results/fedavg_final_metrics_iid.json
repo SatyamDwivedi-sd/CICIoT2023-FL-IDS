@@ -1,0 +1,21 @@
+{
+  "partition_mode": "iid",
+  "num_clients": 10,
+  "rounds": 20,
+  "local_epochs": 3,
+  "batch_size": 4096,
+  "random_seed": 42,
+  "test_accuracy": 0.7774160676272086,
+  "test_f1_macro": 0.5053144196690886,
+  "test_f1_weighted": 0.7219800611326765,
+  "test_f1_per_class": {
+    "DDoS": 0.8604549896012221,
+    "DoS": 0.2078523390657516,
+    "Mirai": 0.9941203757269919,
+    "Benign": 0.7276245623256721,
+    "Recon": 0.6752939555392247,
+    "Spoofing": 0.3842179068987593,
+    "Web": 0.0,
+    "BruteForce": 0.19295122819508723
+  }
+}

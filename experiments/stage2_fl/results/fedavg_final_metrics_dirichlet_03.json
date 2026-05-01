@@ -1,0 +1,18 @@
+{
+  "partition_mode": "dirichlet_03",
+  "rounds": 20,
+  "local_epochs": 3,
+  "batch_size": 4096,
+  "seed": 42,
+  "test_accuracy": 0.7966649139223205,
+  "test_f1_macro": 0.5044938652622835,
+  "test_f1_weighted": 0.7581802899191197,
+  "f1_DDoS": 0.876323312833432,
+  "f1_DoS": 0.37368504500252575,
+  "f1_Mirai": 0.9940732907946267,
+  "f1_Benign": 0.7172989134714871,
+  "f1_Recon": 0.6152939420690912,
+  "f1_Spoofing": 0.20242441645813677,
+  "f1_Web": 0.096,
+  "f1_BruteForce": 0.16085200146896805
+}
