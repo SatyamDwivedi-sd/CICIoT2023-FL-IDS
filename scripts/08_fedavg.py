@@ -3,11 +3,11 @@
 Mirrors experiments/stage2_fl/notebooks/10_FL_FedAvg.ipynb exactly.
 Centralised baseline (scripts/07) must already exist before running this.
 
-Outputs (all suffixed with partition mode so runs do not overwrite):
-  fedavg/fedavg_round_log_{mode}.json
-  results/fedavg_final_metrics_{mode}.json
-  results/fedavg_final_metrics_{mode}.csv
-  plots/fedavg_curves_{mode}.png
+Outputs (all suffixed with partition mode and seed so runs do not overwrite):
+  fedavg/fedavg_round_log_{mode}_seed{seed}.json
+  results/fedavg_final_metrics_{mode}_seed{seed}.json
+  results/fedavg_final_metrics_{mode}_seed{seed}.csv
+  plots/fedavg_curves_{mode}_seed{seed}.png
 """
 
 import argparse
@@ -168,7 +168,8 @@ def plot_and_save_curves(round_log, args, num_clients, plots_dir):
     )
     plt.tight_layout()
 
-    plot_path = plots_dir / f'fedavg_curves_{args.partition_mode}.png'
+    output_suffix = f'{args.partition_mode}_seed{args.seed}'
+    plot_path = plots_dir / f'fedavg_curves_{output_suffix}.png'
     fig.savefig(plot_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
     print(f'Plot         → {plot_path}')
@@ -310,6 +311,7 @@ def main():
 
     # ── Save outputs ──────────────────────────────────────────────────────────
     mode = args.partition_mode
+    output_suffix = f'{mode}_seed{args.seed}'
 
     # Config block included in every output
     config = {
@@ -321,7 +323,7 @@ def main():
     }
 
     # Round log JSON: metadata wrapper + rounds array
-    log_path = args.fedavg_dir / f'fedavg_round_log_{mode}.json'
+    log_path = args.fedavg_dir / f'fedavg_round_log_{output_suffix}.json'
     with open(log_path, 'w') as f:
         json.dump({**config, 'round_log': round_log}, f, indent=2)
     print(f'Round log    → {log_path}')
@@ -334,7 +336,7 @@ def main():
         'test_f1_weighted': test_f1w,
         **per_class_dict,          # f1_DDoS, f1_DoS, ...
     }
-    metrics_json = args.results_dir / f'fedavg_final_metrics_{mode}.json'
+    metrics_json = args.results_dir / f'fedavg_final_metrics_{output_suffix}.json'
     with open(metrics_json, 'w') as f:
         json.dump(final_metrics, f, indent=2)
     print(f'Metrics JSON → {metrics_json}')
@@ -347,7 +349,7 @@ def main():
            {'metric': 'test_f1_weighted', 'value': test_f1w}]
         + [{'metric': k, 'value': v} for k, v in per_class_dict.items()]
     )
-    metrics_csv = args.results_dir / f'fedavg_final_metrics_{mode}.csv'
+    metrics_csv = args.results_dir / f'fedavg_final_metrics_{output_suffix}.csv'
     pd.DataFrame(rows).to_csv(metrics_csv, index=False)
     print(f'Metrics CSV  → {metrics_csv}')
 
@@ -356,10 +358,10 @@ def main():
 
     print()
     print('── All outputs saved ──')
-    print(f'  fedavg/   fedavg_round_log_{mode}.json')
-    print(f'  results/  fedavg_final_metrics_{mode}.json')
-    print(f'  results/  fedavg_final_metrics_{mode}.csv')
-    print(f'  plots/    fedavg_curves_{mode}.png')
+    print(f'  fedavg/   fedavg_round_log_{output_suffix}.json')
+    print(f'  results/  fedavg_final_metrics_{output_suffix}.json')
+    print(f'  results/  fedavg_final_metrics_{output_suffix}.csv')
+    print(f'  plots/    fedavg_curves_{output_suffix}.png')
 
 
 if __name__ == '__main__':
