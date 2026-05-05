@@ -17,3 +17,7 @@ __pycache__/
 *.h5
 *.pt
 *.pth
+
+# macOS
+.DS_Store
+**/.DS_Store
