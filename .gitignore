@@ -1,23 +1,62 @@
-# Data files
+# =========================
+# Data files / datasets
+# =========================
 *.csv
-*.pkl
 *.zip
+*.parquet
+*.npy
+*.npz
+*.pkl
 
-# Jupyter checkpoints
-.ipynb_checkpoints/
+raw_downloads/*.zip
+extracted/*.csv
+extracted/MERGED_CSV/
 
-# Python
-__pycache__/
-*.pyc
-
-# VS Code
-.vscode/
-
-# Models
+# =========================
+# Model files
+# =========================
+*.keras
 *.h5
 *.pt
 *.pth
+*.ckpt
 
-# macOS
+# =========================
+# Logs / outputs
+# =========================
+*.log
+*.out
+*.err
+slurm-*.out
+
+# =========================
+# Python / Jupyter
+# =========================
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# =========================
+# Environments
+# =========================
+.venv/
+venv/
+env/
+*.egg-info/
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
 .DS_Store
 **/.DS_Store
+
+# =========================
+# Keep important summaries/figures
+# =========================
+!experiments/stage2_fl/results/*.csv
+!experiments/stage2_fl/results/*.json
+!experiments/stage2_fl/plots/*.png
+!experiments/stage2_fl/partitioning/partition_summary.json
+!experiments/stage2_fl/partitioning/partition_interpretation.md
+!experiments/stage2_fl/partitioning/.gitkeep
